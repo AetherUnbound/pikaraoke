@@ -1,7 +1,10 @@
 # Author: Matthew Bowden, Nate Kaldor
-import taglib
+from mutagen.easyid3 import EasyID3
+from mutagen.mp3 import MP3
 
-
+# Shortcut to see what EasyID3 allows you to get from the audio file
+# This may be useful in future developments
+# print(EasyID3.valid_keys.keys())
 
 class Song(object):
 
@@ -13,17 +16,27 @@ class Song(object):
         """
         self._mp3_path = mp3_path
         self._cdg_path = cdg_path
-        self._song = taglib.File(mp3_path)
+        self._song = MP3(mp3_path, ID3 = EasyID3)
+        
+        # Make sure that the song file has a matching lyrics file
+        # assert self._cdg_path == self._mp3_path.replace('.mp3', '.cdg')
 
-        # some assertion that _mp3_path is in the same folder as _cdg_path
-        assert self._cdg_path == self._mp3_path.replace('.mp3', '.cdg') #This should work for that
-
-    # No need for setters - we're assuming these will stay constant,
-    # i.e. the song info is static and won't change
     @property
     def artist(self):
-        return self._song.tags['ARTIST']
+        return self._song['artist']
 
     @property
     def title(self):
-        return self._song.tags['TITLE']
+        return self._song['title']
+
+    #This didn't work
+    @property
+    def length(self):
+        return self._song.info.length
+
+# debug statements
+test_song = Song("/Users/nate/Desktop/2 Pac - California Love [SF Karaoke].mp3", None)
+print("Artist:", test_song.artist, "Title:", test_song.title, "Length:", test_song.length)
+
+song = MP3("/Users/nate/Desktop/2 Pac - California Love [SF Karaoke].mp3", ID3 = EasyID3)
+# print(song.pprint())
